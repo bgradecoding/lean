@@ -7,6 +7,7 @@ import { BacklogList } from "@/components/backlog/backlog-list";
 import { BacklogFilters } from "@/components/backlog/backlog-filters";
 import { BacklogFormDialog } from "@/components/backlog/backlog-form-dialog";
 import { AiExtractDialog } from "@/components/backlog/ai-extract-dialog";
+import { BacklogGroupingDialog } from "@/components/backlog/backlog-grouping-dialog";
 import { AppLayout } from "@/components/layout/app-layout";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -89,6 +90,10 @@ export default function BacklogPage() {
           </div>
           <div className="flex gap-3">
             <AiExtractDialog onSuccess={fetchBacklogs} />
+            <BacklogGroupingDialog
+              backlogs={backlogs}
+              onSuccess={fetchBacklogs}
+            />
             <BacklogFormDialog
               trigger={
                 <Button size="lg">
