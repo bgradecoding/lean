@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { TagInput } from "./tag-input";
 import { BacklogPriority, BacklogSource, BacklogStatus, type Backlog } from "@/types";
 
 interface BacklogFormProps {
@@ -41,6 +42,23 @@ export function BacklogForm({ backlog, onSubmit, onCancel, isSubmitting }: Backl
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof BacklogFormData, string>>>({});
+  const [popularTags, setPopularTags] = useState<Array<{ tag: string; count: number }>>([]);
+
+  // Fetch popular tags
+  useEffect(() => {
+    async function fetchPopularTags() {
+      try {
+        const response = await fetch("/api/backlog/tags");
+        if (response.ok) {
+          const data = await response.json();
+          setPopularTags(data.tags || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch popular tags:", error);
+      }
+    }
+    fetchPopularTags();
+  }, []);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof BacklogFormData, string>> = {};
@@ -147,15 +165,12 @@ export function BacklogForm({ backlog, onSubmit, onCancel, isSubmitting }: Backl
 
       <div className="space-y-2">
         <Label htmlFor="tags">태그</Label>
-        <Input
-          id="tags"
+        <TagInput
           value={formData.tags}
-          onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-          placeholder="태그를 쉼표로 구분하여 입력 (예: 성능, UX, 로그인)"
+          onChange={(tags) => setFormData({ ...formData, tags })}
+          placeholder="태그를 입력하세요..."
+          popularTags={popularTags}
         />
-        <p className="text-xs text-gray-500">
-          쉼표(,)로 구분하여 여러 태그를 입력할 수 있습니다
-        </p>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">

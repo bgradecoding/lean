@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDistanceToNow } from "@/lib/utils";
+import { formatDistanceToNow, cn } from "@/lib/utils";
+import { getTagColor } from "@/lib/tag-utils";
 import { BacklogPriority, BacklogStatus, type BacklogWithLinks } from "@/types";
 import { FileText, Users, ClipboardList, Search, MoreHorizontal } from "lucide-react";
 
@@ -65,12 +66,13 @@ export function BacklogCard({ backlog }: BacklogCardProps) {
             {tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {tags.slice(0, 3).map((tag, index) => (
-                  <span
+                  <Badge
                     key={index}
-                    className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded"
+                    variant="secondary"
+                    className={cn("text-xs", getTagColor(tag))}
                   >
                     #{tag}
-                  </span>
+                  </Badge>
                 ))}
                 {tags.length > 3 && (
                   <span className="text-xs text-gray-500">+{tags.length - 3}</span>

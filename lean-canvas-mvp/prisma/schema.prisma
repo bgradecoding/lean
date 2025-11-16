@@ -63,6 +63,10 @@ model Backlog {
   status      String   @default("New")     // New, Validated, InCanvas, Rejected
   tags        String?  // 쉼표로 구분된 태그
 
+  // 공유 설정
+  isPublic    Boolean  @default(false)
+  shareToken  String?  @unique
+
   // 날짜
   discoveredAt DateTime @default(now())
   createdAt    DateTime @default(now())
@@ -77,6 +81,7 @@ model Backlog {
   @@index([userId])
   @@index([status])
   @@index([priority])
+  @@index([shareToken])
 }
 
 model CanvasBacklogLink {

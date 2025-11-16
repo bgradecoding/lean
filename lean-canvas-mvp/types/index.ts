@@ -133,6 +133,8 @@ export interface Backlog {
   priority: string;
   status: string;
   tags?: string | null;
+  isPublic?: boolean;
+  shareToken?: string | null;
   discoveredAt: Date | string;
   createdAt: Date | string;
   updatedAt: Date | string;

@@ -11,14 +11,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BacklogFormDialog } from "@/components/backlog/backlog-form-dialog";
 import { LinkedCanvasList } from "@/components/backlog/linked-canvas-list";
 import { LinkCanvasDialog } from "@/components/backlog/link-canvas-dialog";
+import { ShareDialog } from "@/components/backlog/share-dialog";
 import {
   type BacklogWithLinks,
   BacklogPriority,
   BacklogStatus,
   BacklogSource,
 } from "@/types";
-import { ArrowLeft, Edit, Trash2, Plus, FileText, Calendar } from "lucide-react";
-import { formatDistanceToNow } from "@/lib/utils";
+import { ArrowLeft, Edit, Trash2, Plus, FileText, Calendar, Share2 } from "lucide-react";
+import { formatDistanceToNow, cn } from "@/lib/utils";
+import { getTagColor } from "@/lib/tag-utils";
 
 const priorityConfig = {
   [BacklogPriority.High]: { variant: "danger" as const, label: "High" },
@@ -192,6 +194,17 @@ export default function BacklogDetailPage({ params }: { params: { slug: string }
                     <CardTitle className="text-2xl">{backlog.title}</CardTitle>
                   </div>
                   <div className="flex gap-2">
+                    <ShareDialog
+                      backlogSlug={params.slug}
+                      isPublic={backlog.isPublic || false}
+                      shareToken={backlog.shareToken || null}
+                      onShareToggle={fetchBacklog}
+                      trigger={
+                        <Button variant="outline" size="sm">
+                          <Share2 className="w-4 h-4" />
+                        </Button>
+                      }
+                    />
                     <BacklogFormDialog
                       trigger={
                         <Button variant="outline" size="sm">
@@ -227,12 +240,13 @@ export default function BacklogDetailPage({ params }: { params: { slug: string }
                     <h3 className="text-sm font-medium text-gray-700 mb-2">태그</h3>
                     <div className="flex flex-wrap gap-2">
                       {tags.map((tag, index) => (
-                        <span
+                        <Badge
                           key={index}
-                          className="text-sm px-3 py-1 bg-gray-100 text-gray-700 rounded-full"
+                          variant="secondary"
+                          className={cn("text-sm", getTagColor(tag))}
                         >
                           #{tag}
-                        </span>
+                        </Badge>
                       ))}
                     </div>
                   </div>

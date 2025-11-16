@@ -9,6 +9,7 @@ interface BacklogListProps {
   searchQuery: string;
   priorityFilter: string;
   statusFilter: string;
+  tagFilter: string;
   sortBy: string;
 }
 
@@ -17,6 +18,7 @@ export function BacklogList({
   searchQuery,
   priorityFilter,
   statusFilter,
+  tagFilter,
   sortBy,
 }: BacklogListProps) {
   const filteredAndSortedBacklogs = useMemo(() => {
@@ -47,6 +49,15 @@ export function BacklogList({
       result = result.filter((backlog) => backlog.status === statusFilter);
     }
 
+    // Apply tag filter
+    if (tagFilter && tagFilter !== "all") {
+      result = result.filter((backlog) => {
+        if (!backlog.tags) return false;
+        const tags = backlog.tags.split(",").map((tag) => tag.trim());
+        return tags.includes(tagFilter);
+      });
+    }
+
     // Apply sorting
     result.sort((a, b) => {
       switch (sortBy) {
@@ -70,13 +81,13 @@ export function BacklogList({
     });
 
     return result;
-  }, [backlogs, searchQuery, priorityFilter, statusFilter, sortBy]);
+  }, [backlogs, searchQuery, priorityFilter, statusFilter, tagFilter, sortBy]);
 
   if (filteredAndSortedBacklogs.length === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">
-          {searchQuery || priorityFilter !== "all" || statusFilter !== "all"
+          {searchQuery || priorityFilter !== "all" || statusFilter !== "all" || tagFilter !== "all"
             ? "검색 결과가 없습니다"
             : "백로그가 없습니다. 새 백로그를 추가해보세요!"}
         </p>

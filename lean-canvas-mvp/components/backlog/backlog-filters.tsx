@@ -18,8 +18,11 @@ interface BacklogFiltersProps {
   onPriorityChange: (priority: string) => void;
   statusFilter: string;
   onStatusChange: (status: string) => void;
+  tagFilter: string;
+  onTagChange: (tag: string) => void;
   sortBy: string;
   onSortChange: (sort: string) => void;
+  availableTags?: string[];
 }
 
 export function BacklogFilters({
@@ -29,8 +32,11 @@ export function BacklogFilters({
   onPriorityChange,
   statusFilter,
   onStatusChange,
+  tagFilter,
+  onTagChange,
   sortBy,
   onSortChange,
+  availableTags = [],
 }: BacklogFiltersProps) {
   return (
     <div className="space-y-4">
@@ -73,6 +79,22 @@ export function BacklogFilters({
               <SelectItem value={BacklogStatus.Validated}>Validated</SelectItem>
               <SelectItem value={BacklogStatus.InCanvas}>In Canvas</SelectItem>
               <SelectItem value={BacklogStatus.Rejected}>Rejected</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex-1 min-w-[150px]">
+          <Select value={tagFilter} onValueChange={onTagChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="모든 태그" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">모든 태그</SelectItem>
+              {availableTags.map((tag) => (
+                <SelectItem key={tag} value={tag}>
+                  #{tag}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

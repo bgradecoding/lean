@@ -17,11 +17,13 @@ export default function BacklogPage() {
   const router = useRouter();
   const [backlogs, setBacklogs] = useState<BacklogWithLinks[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [tagFilter, setTagFilter] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
 
   useEffect(() => {
@@ -43,6 +45,18 @@ export default function BacklogPage() {
       }
       const data = await response.json();
       setBacklogs(data.backlogs || []);
+
+      // Extract unique tags from backlogs
+      const tagSet = new Set<string>();
+      data.backlogs?.forEach((backlog: BacklogWithLinks) => {
+        if (backlog.tags) {
+          backlog.tags.split(",").forEach((tag) => {
+            const trimmed = tag.trim();
+            if (trimmed) tagSet.add(trimmed);
+          });
+        }
+      });
+      setAvailableTags(Array.from(tagSet).sort());
     } catch (error) {
       console.error("Error fetching backlogs:", error);
       setBacklogs([]);
@@ -94,8 +108,11 @@ export default function BacklogPage() {
           onPriorityChange={setPriorityFilter}
           statusFilter={statusFilter}
           onStatusChange={setStatusFilter}
+          tagFilter={tagFilter}
+          onTagChange={setTagFilter}
           sortBy={sortBy}
           onSortChange={setSortBy}
+          availableTags={availableTags}
         />
 
         <div className="mt-8">
@@ -104,6 +121,7 @@ export default function BacklogPage() {
             searchQuery={searchQuery}
             priorityFilter={priorityFilter}
             statusFilter={statusFilter}
+            tagFilter={tagFilter}
             sortBy={sortBy}
           />
         </div>
