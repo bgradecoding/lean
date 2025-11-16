@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // bcrypt hashed
+  name      String?
+  canvases  Canvas[]
+  backlogs  Backlog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Canvas {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+
+  // 9 Lean Canvas Blocks (JSON fields for MVP simplicity)
+  problem             String? @db.Text
+  solution            String? @db.Text
+  uniqueValueProp     String? @db.Text
+  unfairAdvantage     String? @db.Text
+  customerSegments    String? @db.Text
+  keyMetrics          String? @db.Text
+  channels            String? @db.Text
+  costStructure       String? @db.Text
+  revenueStreams      String? @db.Text
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  backlogLinks CanvasBacklogLink[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Backlog {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+
+  // 기본 정보
+  title       String
+  description String?  @db.Text
+
+  // 메타데이터
+  source      String?  // Meeting, Interview, Survey, Research, Other
+  priority    String   @default("Medium")  // High, Medium, Low
+  status      String   @default("New")     // New, Validated, InCanvas, Rejected
+  tags        String?  // 쉼표로 구분된 태그
+
+  // 날짜
+  discoveredAt DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // 관계
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  canvasLinks  CanvasBacklogLink[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+}
+
+model CanvasBacklogLink {
+  id         String   @id @default(cuid())
+
+  canvasId   String
+  canvas     Canvas   @relation(fields: [canvasId], references: [id], onDelete: Cascade)
+
+  backlogId  String
+  backlog    Backlog  @relation(fields: [backlogId], references: [id], onDelete: Cascade)
+
+  notes      String?  @db.Text  // 연결 시 메모
+  createdAt  DateTime @default(now())
+
+  @@unique([canvasId, backlogId])
+  @@index([canvasId])
+  @@index([backlogId])
+}
